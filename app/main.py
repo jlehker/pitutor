@@ -17,7 +17,8 @@ app = FastAPI(
 
 loop = asyncio.get_event_loop()
 queue = asyncio.Queue()
-connection = None
+connection = Connection(loop, FEED_CHARACTERISTIC)
+
 
 
 async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
@@ -32,7 +33,6 @@ async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
 
 @app.on_event("startup")
 async def startup_event():
-    connection = Connection(loop, FEED_CHARACTERISTIC)
     asyncio.ensure_future(connection.manager())
     asyncio.ensure_future(feed_queue_manager(connection, queue))
 
@@ -53,7 +53,7 @@ async def feed():
 async def status():
     return {
         "bluetooth": "Connected to PetTutor."
-        if all((connection, connection.client, connection.connected))
+        if hasattr(connection, "client") and connection.connected
         else "Connecting"
     }
 
