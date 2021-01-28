@@ -31,7 +31,7 @@ export default {
       await this.axios.get("http://raspberrypi.home:8000/feed");
     },
     getStatus() {
-      await this.axios.get("http://raspberrypi.home:8000/api/status").then(res => this.status = res.data.status);
+      this.axios.get("http://raspberrypi.home:8000/api/status").then(res => this.status = res.data.status);
     }
   },
   beforeDestroy () {
