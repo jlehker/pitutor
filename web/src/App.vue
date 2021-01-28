@@ -1,32 +1,35 @@
 <template>
-  <v-app>
-    <v-card width="450" class="mx-auto mt-5">
-      <v-card-title class="pb-0">
-        <h1>PetTutor Control</h1>
-      </v-card-title>
-      <v-card-text> </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-btn color="info" @click="feed()">Manual Feed</v-btn>
-        <v-btn color="success">Start Schedule</v-btn>
-        <v-btn color="error">Stop Schedule</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-app>
+  <div id="app">
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/logs">Logs</router-link> |
+      <router-link to="/schedule">Schedule</router-link> |
+      <router-link to="/settings">Settings</router-link> |
+      <router-link to="/about">About</router-link>
+    </div>
+    <router-view />
+  </div>
 </template>
 
-<script>
-export default {
-  name: "App",
-  data() {
-    return {
-      //
-    };
-  },
-  methods: {
-    async feed() {
-      await this.axios.get("http://raspberrypi.home:8000/feed");
-    },
-  },
-};
-</script>
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+#nav {
+  padding: 30px;
+
+  a {
+    font-weight: bold;
+    color: #2c3e50;
+
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}
+</style>
