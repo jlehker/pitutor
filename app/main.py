@@ -49,6 +49,13 @@ async def feed():
         queue.put_nowait(0)
     return "done."
 
+@app.get("/api/status")
+async def status():
+    return {
+        "bluetooth": "Connected to PetTutor."
+        if all((connection, connection.client, connection.connected))
+        else "Connecting"
+    }
 
 @app.get("/")
 async def serve_home(request: Request):

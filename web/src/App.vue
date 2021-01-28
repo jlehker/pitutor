@@ -4,7 +4,7 @@
       <v-card-title class="pb-0">
         <h1>PetTutor Control</h1>
       </v-card-title>
-      <v-card-text>Status: {{ status }}</v-card-text>
+      <v-card-text>Bluetooth Status: {{ status }}</v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-btn color="info" @click="feed()">Manual Feed</v-btn>
@@ -31,7 +31,7 @@ export default {
       await this.axios.get("http://raspberrypi.home:8000/feed");
     },
     getStatus() {
-      this.axios.get("http://raspberrypi.home:8000/api/status").then(res => this.status = res.data.status);
+      this.axios.get("http://raspberrypi.home:8000/api/status").then(res => this.status = res.data.bluetooth);
     }
   },
   beforeDestroy () {
