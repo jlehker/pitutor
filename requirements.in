@@ -1,0 +1,7 @@
+aiofiles
+bleak
+fastapi
+jinja2
+nodeenv
+tortoise-orm
+uvicorn[standard]
