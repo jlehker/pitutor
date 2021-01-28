@@ -25,7 +25,7 @@ export default {
   },
   created() {
     this.timer = setInterval(this.getStatus(), 100)
-  }
+  },
   methods: {
     async feed() {
       await this.axios.get("http://raspberrypi.home:8000/feed");
