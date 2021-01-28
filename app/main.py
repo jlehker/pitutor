@@ -26,7 +26,7 @@ async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
         if connection.client and connection.connected:
             await queue.get()
             await connection.client.write_gatt_char(FEED_CHARACTERISTIC, bytearray(0))
-            print(f"Sent feed instruction.")
+            print("Sent feed instruction.")
         else:
             await asyncio.sleep(2.0, loop=loop)
 
@@ -45,7 +45,7 @@ async def shutdown_event():
 
 @app.get("/feed")
 async def feed():
-    if queue is not None:
+    if all([queue, connection, connection.connected]):
         queue.put_nowait(0)
     return "done."
 
