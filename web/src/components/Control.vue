@@ -2,9 +2,9 @@
   <v-app>
     <v-card width="450" class="mx-auto mt-5">
       <v-card-title class="pb-0">
-        <h1>PetTutor Control</h1>
+        <h1>PiTutor Control</h1>
       </v-card-title>
-      <v-card-text> </v-card-text>
+      <v-card-text>Status: { this.status } </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-btn color="info" @click="feed()">Manual Feed</v-btn>
@@ -19,12 +19,23 @@
 export default {
   name: "Control",
   data() {
-    return {};
+    return {
+      status: ''
+    };
   },
+  created() {
+    this.timer = setInterval(this.getStatus(), 100)
+  },
+  beforeDestroy () {
+      clearInterval(this.timer)
+  }
   methods: {
     async feed() {
       await this.axios.get("http://raspberrypi.home:8000/feed");
     },
+    getStatus() {
+      this.axios.get("http://raspberrypi.home:8000/api/status").then(res => this.status = res.data.bluetooth);
+    }
   },
 };
 </script>
