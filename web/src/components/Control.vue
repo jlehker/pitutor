@@ -1,18 +1,57 @@
 <template>
-  <v-app>
-    <v-card width="450" class="mx-auto mt-5">
-      <v-card-title class="pb-0">
-        <h1>PiTutor Control</h1>
-      </v-card-title>
-      <v-card-text>Status: {{ this.status }} </v-card-text>
-      <v-divider></v-divider>
-      <v-card-actions>
-        <v-btn color="info" @click="feed()">Manual Feed</v-btn>
-        <v-btn color="success">Start Schedule</v-btn>
-        <v-btn color="error">Stop Schedule</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-app>
+  <div>
+    <v-row>
+      <v-col lg="4" cols="sm" class="pb-2">
+        <v-card>
+          <v-row class="no-gutters">
+            <div class="col-auto">
+              <div class="cyan fill-height">&nbsp;</div>
+            </div>
+            <div class="col pa-3 py-4 cyan--text">
+              <h5 class="text-truncate text-uppercase">Bluetooth Status</h5>
+              <h1>{{ status }}</h1>
+            </div>
+          </v-row>
+        </v-card>
+      </v-col>
+      <v-col lg="4" cols="sm" class="pb-2">
+        <v-card>
+          <v-row class="no-gutters">
+            <div class="col-auto">
+              <div class="primary fill-height">&nbsp;</div>
+            </div>
+            <div class="col pa-3 py-4 primary--text">
+              <h5 class="text-truncate text-uppercase">API Status</h5>
+              <h1>{{ status }}</h1>
+            </div>
+          </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col lg="4" cols="md" class="pb-2">
+        <v-card min-height="131">
+          <v-card-title class="font-weight-light text-truncate primary--text">
+            Manual Control
+          </v-card-title>
+          <v-card-actions>
+            <v-btn @click="feed()" rounded color="primary"> Feed </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <v-col lg="4" cols="md" class="pb-2">
+        <v-card min-height="131">
+          <v-card-title class="font-weight-light text-truncate success--text">
+            Schedule
+          </v-card-title>
+          <v-card-actions>
+            <v-btn outlined rounded color="success"> Start </v-btn>
+            <v-btn outlined rounded color="error"> Stop </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
@@ -24,7 +63,7 @@ export default {
     };
   },
   created() {
-    this.timer = setInterval(this.getStatus(), 100);
+    this.timer = setInterval(this.getStatus, 100);
   },
   beforeDestroy() {
     clearInterval(this.timer);
