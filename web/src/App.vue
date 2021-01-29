@@ -139,9 +139,9 @@ export default {
       { title: "Home", href: "/", icon: "mdi-home-outline" },
       { title: "Logs", href: "/logs", icon: "mdi-format-list-bulleted" },
       { title: "Schedule", href: "/schedule", icon: "mdi-alarm" },
-      { title: "Settings", href: "/settings", icon: "mdi-cog-outline" },
       { title: "Alerts", href: "/alerts", icon: "mdi-alarm-light-outline" },
       { title: "About", href: "/about", icon: "mdi-information-outline" },
+      { title: "Settings", href: "/settings", icon: "mdi-cog-outline" },
     ],
   }),
 };

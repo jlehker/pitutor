@@ -2,7 +2,6 @@ import asyncio
 
 from bleak import BleakClient, discover
 
-
 class Connection:
 
     client: BleakClient = None

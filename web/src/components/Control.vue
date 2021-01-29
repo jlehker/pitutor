@@ -63,7 +63,7 @@ export default {
     };
   },
   created() {
-    this.timer = setInterval(this.getStatus, 100);
+    this.timer = setInterval(this.getStatus, 1500);
   },
   beforeDestroy() {
     clearInterval(this.timer);

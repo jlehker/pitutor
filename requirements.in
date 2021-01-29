@@ -1,7 +1,9 @@
 aiofiles
+aiosqlite
 bleak
 fastapi
 jinja2
+gunicorn
 nodeenv
 tortoise-orm
 uvicorn[standard]
