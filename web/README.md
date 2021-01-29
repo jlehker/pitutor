@@ -1,4 +1,4 @@
-# web
+# PiTutor web
 
 ## Project setup
 ```
