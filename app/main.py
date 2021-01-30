@@ -94,7 +94,7 @@ async def start_schedule():
     start_event.set()
 
 @app.post("/api/schedule/stop")
-async def start_schedule():
+async def stop_schedule():
     stop_event.set()
 
 @app.get("/api/events", response_model=List[EventPydantic])
