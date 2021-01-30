@@ -1,5 +1,6 @@
 import asyncio
 from typing import List
+from datetime import datetime, timedelta
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -21,6 +22,12 @@ app = FastAPI(
 loop = asyncio.get_event_loop()
 queue = asyncio.Queue()
 connection = Connection(loop, FEED_CHARACTERISTIC)
+start_event = asyncio.Event()
+stop_event = asyncio.Event()
+
+INITIAL_DELAY = 120
+INTERVAL = 30
+TIMEOUT = 600
 
 
 async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
@@ -34,10 +41,31 @@ async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
             await asyncio.sleep(2.0, loop=loop)
 
 
+async def feed_scheduler(
+    queue: asyncio.Queue, start_event: asyncio.Event, stop_event: asyncio.Event
+):
+    while True:
+        await start_event.wait()
+        await asyncio.sleep(INITIAL_DELAY, loop=loop)
+        end_time = datetime.utcnow() + timedelta(seconds=TIMEOUT)
+        while datetime.utcnow() < end_time:
+            queue.put_nowait(0)  # Feed
+            done, running = await asyncio.wait(
+                [
+                    stop_event.wait(),
+                    asyncio.sleep(INTERVAL),
+                ],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+            if stop_event in done:
+                break
+
+
 @app.on_event("startup")
 async def startup_event():
     asyncio.ensure_future(connection.manager())
     asyncio.ensure_future(feed_queue_manager(connection, queue))
+    asyncio.ensure_future(feed_scheduler(connection, start_event, stop_event))
 
 
 @app.on_event("shutdown")
@@ -61,6 +89,13 @@ async def status():
         else "Connecting..."
     }
 
+@app.post("/api/schedule/start")
+async def start_schedule():
+    start_event.set()
+
+@app.post("/api/schedule/stop")
+async def start_schedule():
+    stop_event.set()
 
 @app.get("/api/events", response_model=List[EventPydantic])
 async def get_events():
