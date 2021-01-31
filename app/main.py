@@ -1,6 +1,7 @@
 import asyncio
 from typing import List
 from datetime import datetime, timedelta
+from random import randint
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -58,7 +59,7 @@ async def feed_scheduler(
         while datetime.utcnow() < end_time:
             queue.put_nowait(0)  # Feed
             await asyncio.wait(
-                [stop_event.wait(), asyncio.sleep(INTERVAL, loop=loop)],
+                [stop_event.wait(), asyncio.sleep(randint(*INTERVAL_RANGE), loop=loop)],
                 return_when=asyncio.FIRST_COMPLETED,
             )
             if stop_event.is_set():
