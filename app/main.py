@@ -58,7 +58,10 @@ async def feed_scheduler(
                 break
             queue.put_nowait(0)  # Feed
             await asyncio.wait(
-                [stop_event.wait(), asyncio.sleep(randrange(*INTERVAL_RANGE), loop=loop)],
+                [
+                    stop_event.wait(),
+                    asyncio.sleep(randrange(*INTERVAL_RANGE), loop=loop),
+                ],
                 return_when=asyncio.FIRST_COMPLETED,
             )
         start_event.clear()
@@ -105,7 +108,7 @@ async def stop_schedule():
 
 @app.get("/api/events", response_model=List[EventPydantic])
 async def get_events():
-    return await EventPydantic.from_queryset(Event.all())
+    return await EventPydantic.from_queryset(Event.all().order_by("-timestamp"))
 
 
 @app.get("/")
