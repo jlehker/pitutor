@@ -4,15 +4,11 @@ from datetime import datetime, timedelta
 from random import randrange
 
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from tortoise.contrib.fastapi import register_tortoise
 
 from .ble import Connection
 from .constants import FEED_CHARACTERISTIC
 from .models import Event, EventPydantic
-
-templates = Jinja2Templates(directory="web/dist")
 
 app = FastAPI(
     title="PiTutor",
@@ -110,13 +106,6 @@ async def stop_schedule():
 async def get_events():
     return await EventPydantic.from_queryset(Event.all().order_by("-timestamp"))
 
-
-@app.get("/")
-async def serve_home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-
-app.mount("/", StaticFiles(directory="web/dist"), name="web")
 
 register_tortoise(
     app,
