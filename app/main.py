@@ -76,11 +76,20 @@ async def shutdown_event():
     loop.run_until_complete(connection.cleanup())
 
 
-@app.get("/feed")
+@app.post("/api/feed", status_code=202)
 async def feed():
     if all([queue, connection, connection.connected]):
         queue.put_nowait(0)
-    return "done."
+
+
+@app.post("/api/schedule/start", status_code=202)
+async def start_schedule():
+    start_event.set()
+
+
+@app.post("/api/schedule/stop", status_code=202)
+async def stop_schedule():
+    stop_event.set()
 
 
 @app.get("/api/status")
@@ -88,18 +97,9 @@ async def status():
     return {
         "bluetooth": "Connected to PetTutor"
         if hasattr(connection, "client") and connection.connected
-        else "Connecting..."
+        else "Connecting...",
+        "schedule": "On" if start_event.is_set() else "Off"
     }
-
-
-@app.post("/api/schedule/start")
-async def start_schedule():
-    start_event.set()
-
-
-@app.post("/api/schedule/stop")
-async def stop_schedule():
-    stop_event.set()
 
 
 @app.get("/api/events", response_model=List[EventPydantic])

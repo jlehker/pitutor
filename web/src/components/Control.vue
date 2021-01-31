@@ -70,17 +70,17 @@ export default {
   },
   methods: {
     async feed() {
-      await this.axios.get("http://raspberrypi.home:8000/feed");
+      await this.axios.post("http://raspberrypi.home/api/feed");
     },
     async startSchedule() {
-      await this.axios.post("http://raspberrypi.home:8000/api/schedule/start");
+      await this.axios.post("http://raspberrypi.home/api/schedule/start");
     },
     async stopSchedule() {
-      await this.axios.post("http://raspberrypi.home:8000/api/schedule/stop");
+      await this.axios.post("http://raspberrypi.home/api/schedule/stop");
     },
     getStatus() {
       this.axios
-        .get("http://raspberrypi.home:8000/api/status")
+        .get("http://raspberrypi.home/api/status")
         .then((res) => (this.status = res.data.bluetooth));
     },
   },
