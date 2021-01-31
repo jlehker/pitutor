@@ -8,7 +8,7 @@ from tortoise.contrib.fastapi import register_tortoise
 
 from .ble import Connection
 from .constants import FEED_CHARACTERISTIC
-from .models import Event, EventPydantic
+from .models import Event, EventPydantic, ScheduleConfiguration
 
 app = FastAPI(
     title="PiTutor",
@@ -22,9 +22,9 @@ connection = Connection(loop, FEED_CHARACTERISTIC)
 start_event = asyncio.Event()
 stop_event = asyncio.Event()
 
-INITIAL_DELAY = 600
-INTERVAL_RANGE = (30, 300, 5)
-TIMEOUT = 3600
+schedule_config = ScheduleConfiguration(
+    initial_delay=600, interval_range_start=30, interval_range_end=30, timeout=3600
+)
 
 
 async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
@@ -35,7 +35,7 @@ async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
             print("Sent feed instruction.")
             await Event.create(name="FEED")
         else:
-            await asyncio.sleep(2.0, loop=loop)
+            await asyncio.sleep(2)
 
 
 async def feed_scheduler(
@@ -44,10 +44,10 @@ async def feed_scheduler(
     while True:
         await start_event.wait()
         await asyncio.wait(
-            [stop_event.wait(), asyncio.sleep(INITIAL_DELAY, loop=loop)],
+            [stop_event.wait(), asyncio.sleep(schedule_config.initial_delay)],
             return_when=asyncio.FIRST_COMPLETED,
         )
-        end_time = datetime.utcnow() + timedelta(seconds=TIMEOUT)
+        end_time = datetime.utcnow() + timedelta(seconds=schedule_config.timeout)
         while datetime.utcnow() < end_time:
             if stop_event.is_set():
                 stop_event.clear()
@@ -56,7 +56,14 @@ async def feed_scheduler(
             await asyncio.wait(
                 [
                     stop_event.wait(),
-                    asyncio.sleep(randrange(*INTERVAL_RANGE), loop=loop),
+                    asyncio.sleep(
+                        randrange(
+                            schedule_config.interval_range_start,
+                            schedule_config.interval_range_end,
+                            5,
+                        ),
+                        loop=loop,
+                    ),
                 ],
                 return_when=asyncio.FIRST_COMPLETED,
             )
@@ -92,13 +99,23 @@ async def stop_schedule():
     stop_event.set()
 
 
+@app.put("/api/schedule/configuration", status_code=201, response_model=ScheduleConfiguration)
+async def set_schedule(configuration: ScheduleConfiguration):
+    for key, val in configuration.dict().items():
+        setattr(schedule_config, key, val)
+    return schedule_config
+
+@app.get("/api/schedule/configuration", response_model=ScheduleConfiguration)
+async def get_schedule():
+    return schedule_config
+
 @app.get("/api/status")
 async def status():
     return {
         "bluetooth": "Connected to PetTutor"
         if hasattr(connection, "client") and connection.connected
         else "Connecting...",
-        "schedule": "On" if start_event.is_set() else "Off"
+        "schedule": "On" if start_event.is_set() else "Off",
     }
 
 
