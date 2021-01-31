@@ -9,7 +9,7 @@
             </div>
             <div class="col pa-3 py-4 cyan--text">
               <h5 class="text-truncate text-uppercase">Bluetooth Status</h5>
-              <h1>{{ status }}</h1>
+              <h1>{{ status.bluetooth }}</h1>
             </div>
           </v-row>
         </v-card>
@@ -21,8 +21,8 @@
               <div class="primary fill-height">&nbsp;</div>
             </div>
             <div class="col pa-3 py-4 primary--text">
-              <h5 class="text-truncate text-uppercase">API Status</h5>
-              <h1>{{ status }}</h1>
+              <h5 class="text-truncate text-uppercase">Schedule</h5>
+              <h1>{{ status.schedule }}</h1>
             </div>
           </v-row>
         </v-card>
@@ -81,7 +81,7 @@ export default {
     getStatus() {
       this.axios
         .get("http://raspberrypi.home/api/status")
-        .then((res) => (this.status = res.data.bluetooth));
+        .then((res) => (this.status = res.data));
     },
   },
 };

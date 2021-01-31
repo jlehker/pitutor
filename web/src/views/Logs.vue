@@ -46,7 +46,7 @@ export default {
   methods: {
     async getEvents() {
       await this.axios
-        .get("http://raspberrypi.home:8000/api/events")
+        .get("http://raspberrypi.home/api/events")
         .then((res) => (this.reportItems = res.data));
     },
   },
