@@ -25,9 +25,9 @@ connection = Connection(loop, FEED_CHARACTERISTIC)
 start_event = asyncio.Event()
 stop_event = asyncio.Event()
 
-INITIAL_DELAY = 120
-INTERVAL = 30
-TIMEOUT = 600
+INITIAL_DELAY = 600
+INTERVAL_RANGE = (30, 300)
+TIMEOUT = 3600
 
 
 async def feed_queue_manager(connection: Connection, queue: asyncio.Queue):
@@ -46,18 +46,23 @@ async def feed_scheduler(
 ):
     while True:
         await start_event.wait()
-        await asyncio.sleep(INITIAL_DELAY, loop=loop)
+        await asyncio.wait(
+            [stop_event.wait(), asyncio.sleep(INITIAL_DELAY, loop=loop)],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        start_event.clear()
+        if stop_event.is_set():
+            stop_event.clear()
+            continue
         end_time = datetime.utcnow() + timedelta(seconds=TIMEOUT)
         while datetime.utcnow() < end_time:
             queue.put_nowait(0)  # Feed
-            done, running = await asyncio.wait(
-                [
-                    stop_event.wait(),
-                    asyncio.sleep(INTERVAL),
-                ],
+            await asyncio.wait(
+                [stop_event.wait(), asyncio.sleep(INTERVAL, loop=loop)],
                 return_when=asyncio.FIRST_COMPLETED,
             )
-            if stop_event in done:
+            if stop_event.is_set():
+                stop_event.clear()
                 break
 
 
@@ -89,13 +94,16 @@ async def status():
         else "Connecting..."
     }
 
+
 @app.post("/api/schedule/start")
 async def start_schedule():
     start_event.set()
 
+
 @app.post("/api/schedule/stop")
 async def stop_schedule():
     stop_event.set()
+
 
 @app.get("/api/events", response_model=List[EventPydantic])
 async def get_events():
