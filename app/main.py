@@ -65,7 +65,7 @@ async def feed_scheduler(
 async def startup_event():
     asyncio.ensure_future(connection.manager())
     asyncio.ensure_future(feed_queue_manager(connection, queue))
-    asyncio.ensure_future(feed_scheduler(connection, start_event, stop_event))
+    asyncio.ensure_future(feed_scheduler(queue, start_event, stop_event))
 
 
 @app.on_event("shutdown")
