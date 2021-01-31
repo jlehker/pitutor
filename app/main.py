@@ -1,7 +1,7 @@
 import asyncio
 from typing import List
 from datetime import datetime, timedelta
-from random import randint
+from random import randrange
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -27,7 +27,7 @@ start_event = asyncio.Event()
 stop_event = asyncio.Event()
 
 INITIAL_DELAY = 600
-INTERVAL_RANGE = (30, 300)
+INTERVAL_RANGE = (30, 300, 5)
 TIMEOUT = 3600
 
 
@@ -51,20 +51,17 @@ async def feed_scheduler(
             [stop_event.wait(), asyncio.sleep(INITIAL_DELAY, loop=loop)],
             return_when=asyncio.FIRST_COMPLETED,
         )
-        start_event.clear()
-        if stop_event.is_set():
-            stop_event.clear()
-            continue
         end_time = datetime.utcnow() + timedelta(seconds=TIMEOUT)
         while datetime.utcnow() < end_time:
-            queue.put_nowait(0)  # Feed
-            await asyncio.wait(
-                [stop_event.wait(), asyncio.sleep(randint(*INTERVAL_RANGE), loop=loop)],
-                return_when=asyncio.FIRST_COMPLETED,
-            )
             if stop_event.is_set():
                 stop_event.clear()
                 break
+            queue.put_nowait(0)  # Feed
+            await asyncio.wait(
+                [stop_event.wait(), asyncio.sleep(randrange(*INTERVAL_RANGE), loop=loop)],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+        start_event.clear()
 
 
 @app.on_event("startup")
