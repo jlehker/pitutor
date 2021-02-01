@@ -70,17 +70,17 @@ export default {
   },
   methods: {
     async feed() {
-      await this.axios.post("http://raspberrypi.home/api/feed");
+      await this.axios.post("https://raspberrypi.home/api/feed");
     },
     async startSchedule() {
-      await this.axios.post("http://raspberrypi.home/api/schedule/start");
+      await this.axios.post("https://raspberrypi.home/api/schedule/start");
     },
     async stopSchedule() {
-      await this.axios.post("http://raspberrypi.home/api/schedule/stop");
+      await this.axios.post("https://raspberrypi.home/api/schedule/stop");
     },
     getStatus() {
       this.axios
-        .get("http://raspberrypi.home/api/status")
+        .get("https://raspberrypi.home/api/status")
         .then((res) => (this.status = res.data));
     },
   },
