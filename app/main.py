@@ -1,9 +1,10 @@
 import asyncio
-from typing import List
 from datetime import datetime, timedelta
 from random import randrange
+from typing import List
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
 from .ble import Connection
@@ -13,8 +14,16 @@ from .models import Event, EventPydantic, ScheduleConfiguration
 app = FastAPI(
     title="PiTutor",
     description="PetTutor API",
-    version="0.1.0",
+    version="0.1.1",
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 loop = asyncio.get_event_loop()
 queue = asyncio.Queue()
@@ -53,18 +62,13 @@ async def feed_scheduler(
                 stop_event.clear()
                 break
             queue.put_nowait(0)  # Feed
+            rand_args = (
+                schedule_config.interval_range_start,
+                schedule_config.interval_range_end,
+                5,
+            )
             await asyncio.wait(
-                [
-                    stop_event.wait(),
-                    asyncio.sleep(
-                        randrange(
-                            schedule_config.interval_range_start,
-                            schedule_config.interval_range_end,
-                            5,
-                        ),
-                        loop=loop,
-                    ),
-                ],
+                [stop_event.wait(), asyncio.sleep(randrange(*rand_args))],
                 return_when=asyncio.FIRST_COMPLETED,
             )
         start_event.clear()
@@ -99,15 +103,19 @@ async def stop_schedule():
     stop_event.set()
 
 
-@app.put("/api/schedule/configuration", status_code=201, response_model=ScheduleConfiguration)
+@app.put(
+    "/api/schedule/configuration", status_code=201, response_model=ScheduleConfiguration
+)
 async def set_schedule(configuration: ScheduleConfiguration):
     for key, val in configuration.dict().items():
         setattr(schedule_config, key, val)
     return schedule_config
 
+
 @app.get("/api/schedule/configuration", response_model=ScheduleConfiguration)
 async def get_schedule():
     return schedule_config
+
 
 @app.get("/api/status")
 async def status():
