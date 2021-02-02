@@ -45,7 +45,9 @@
             Schedule
           </v-card-title>
           <v-card-actions>
-            <v-btn @click="startSchedule()" outlined rounded color="success"> Start </v-btn>
+            <v-btn @click="startSchedule()" outlined rounded color="success">
+              Start
+            </v-btn>
             <v-btn @click="stopSchedule()" rounded color="error"> Stop </v-btn>
           </v-card-actions>
         </v-card>
@@ -70,17 +72,17 @@ export default {
   },
   methods: {
     async feed() {
-      await this.axios.post("https://raspberrypi.home/api/feed");
+      await this.axios.post("https://pitutor.home/api/feed");
     },
     async startSchedule() {
-      await this.axios.post("https://raspberrypi.home/api/schedule/start");
+      await this.axios.post("https://pitutor.home/api/schedule/start");
     },
     async stopSchedule() {
-      await this.axios.post("https://raspberrypi.home/api/schedule/stop");
+      await this.axios.post("https://pitutor.home/api/schedule/stop");
     },
     getStatus() {
       this.axios
-        .get("https://raspberrypi.home/api/status")
+        .get("https://pitutor.home/api/status")
         .then((res) => (this.status = res.data));
     },
   },
